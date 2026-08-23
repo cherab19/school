@@ -73,11 +73,11 @@ export const AcademicYears: React.FC = () => {
         return;
       }
 
-      // If no active years exist, make this active. Otherwise inactive.
-      const activeYears = dbSelect('SELECT id FROM academic_years WHERE status = "ACTIVE"');
-      const initialStatus = activeYears.length === 0 ? 'ACTIVE' : 'INACTIVE';
+      // Deactivate all previous academic years to replace with the new one
+      dbRun('UPDATE academic_years SET status = "INACTIVE"');
 
-      dbRun('INSERT INTO academic_years (name, status) VALUES (?, ?)', [newYearName, initialStatus]);
+      // Insert new academic year as active
+      dbRun('INSERT INTO academic_years (name, status) VALUES (?, ?)', [newYearName, 'ACTIVE']);
       
       // Auto-create semesters
       dbRun(`
