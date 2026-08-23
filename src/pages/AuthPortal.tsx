@@ -229,9 +229,9 @@ export const AuthPortal: React.FC = () => {
 
         // 2. Set settings
         await updateSettings({
-          school_name: setupSchoolName.trim(),
+          school_name: 'Sabiyan No.1 Primary and Secondary School',
           precision: 1,
-          ranking_enabled: false,
+          ranking_enabled: true,
           annual_policy: '50/50'
         });
 
@@ -508,15 +508,12 @@ export const AuthPortal: React.FC = () => {
                 {/* STEP 1: SCHOOL INFO */}
                 {setupStep === 1 && (
                   <div className="space-y-4 animate-in slide-in-from-right-5">
-                    <div className="space-y-1.5">
-                      <label className="text-sm font-medium flex items-center gap-1.5">
-                        <School className="h-4 w-4 text-muted-foreground" /> School Name
-                      </label>
-                      <Input 
-                        value={setupSchoolName}
-                        onChange={e => setSetupSchoolName(e.target.value)}
-                        placeholder="Sabyan School"
-                      />
+                    <div className="space-y-1.5 bg-muted/40 p-3 rounded-lg border border-border text-xs leading-relaxed text-muted-foreground flex gap-2">
+                      <School className="h-5 w-5 text-primary shrink-0" />
+                      <div>
+                        <p className="font-bold text-foreground mb-0.5">School Profile Configured</p>
+                        <p>Branding is hardcoded to: <strong>Sabiyan No.1 Primary and Secondary School</strong>.</p>
+                      </div>
                     </div>
                     <div className="space-y-1.5">
                       <label className="text-sm font-medium">Initial Academic Year</label>
