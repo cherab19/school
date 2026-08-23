@@ -31,7 +31,7 @@ export const AuthPortal: React.FC = () => {
   // Setup Wizard States
   const [setupStep, setSetupStep] = useState(1);
   const [setupSchoolName, setSetupSchoolName] = useState('Sabiyan No.1 Primary and Secondary School');
-  const [setupAcademicYear, setSetupAcademicYear] = useState('2026/2027');
+  const [setupAcademicYear, setSetupAcademicYear] = useState('2018 E.C.');
   const [setupPassword, setSetupPassword] = useState('');
   const [setupConfirmPassword, setSetupConfirmPassword] = useState('');
   const [setupRecoveryAnswer, setSetupRecoveryAnswer] = useState('');
@@ -185,8 +185,8 @@ export const AuthPortal: React.FC = () => {
         setError('School Name is required.');
         return;
       }
-      if (!/^\d{4}\/\d{4}$/.test(setupAcademicYear)) {
-        setError('Academic Year must follow YYYY/YYYY format (e.g. 2026/2027).');
+      if (!/^\d{4}\s*E\.C\.?$/i.test(setupAcademicYear)) {
+        setError('Academic Year must follow YYYY E.C. format (e.g. 2018 E.C.).');
         return;
       }
       setSetupStep(2);
@@ -508,19 +508,12 @@ export const AuthPortal: React.FC = () => {
                 {/* STEP 1: SCHOOL INFO */}
                 {setupStep === 1 && (
                   <div className="space-y-4 animate-in slide-in-from-right-5">
-                    <div className="space-y-1.5 bg-muted/40 p-3 rounded-lg border border-border text-xs leading-relaxed text-muted-foreground flex gap-2">
-                      <School className="h-5 w-5 text-primary shrink-0" />
-                      <div>
-                        <p className="font-bold text-foreground mb-0.5">School Profile Configured</p>
-                        <p>Branding is hardcoded to: <strong>Sabiyan No.1 Primary and Secondary School</strong>.</p>
-                      </div>
-                    </div>
                     <div className="space-y-1.5">
                       <label className="text-sm font-medium">Initial Academic Year</label>
                       <Input 
                         value={setupAcademicYear}
                         onChange={e => setSetupAcademicYear(e.target.value)}
-                        placeholder="2026/2027"
+                        placeholder="2018 E.C."
                       />
                       <p className="text-[10px] text-muted-foreground mt-0.5 leading-relaxed">
                         Creates the active Academic Cycle. Semesters 1 and 2 will be initialized.
