@@ -4,54 +4,20 @@ import { dbSelect, dbRun, saveDatabase, logAudit } from '../services/db';
 import { hashPassword, generateSalt } from '../utils/crypto';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
-import { Select } from '../components/ui/select';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../components/ui/card';
 import { AlertCircle, CheckCircle2, ShieldCheck } from 'lucide-react';
 
 export const SettingsPage: React.FC = () => {
-  const { settings, updateSettings, currentUser } = useApp();
-
-  // Branding & Configuration states
-  const [schoolName, setSchoolName] = useState(settings.school_name);
-  const [precision, setPrecision] = useState(String(settings.precision));
-  const [rankingEnabled, setRankingEnabled] = useState(settings.ranking_enabled ? 'true' : 'false');
-  const [annualPolicy, setAnnualPolicy] = useState(settings.annual_policy);
+  const { currentUser } = useApp();
 
   // Password state
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [passwordSuccess, setPasswordSuccess] = useState('');
   const [loading, setLoading] = useState(false);
-
-  const handleSaveConfig = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setSuccess('');
-
-    if (!schoolName.trim()) {
-      setError('School name cannot be empty.');
-      return;
-    }
-
-    try {
-      await updateSettings({
-        school_name: schoolName.trim(),
-        precision: parseInt(precision, 10),
-        ranking_enabled: rankingEnabled === 'true',
-        annual_policy: annualPolicy
-      });
-      await saveDatabase();
-      await logAudit('SETTINGS_UPDATE', 'SETTINGS', null, 'Updated branding and academic result configuration settings');
-      setSuccess('Configuration settings saved successfully.');
-    } catch (err: any) {
-      setError(err.message || 'Failed to save configuration settings.');
-    }
-  };
 
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -119,81 +85,7 @@ export const SettingsPage: React.FC = () => {
         <p className="text-muted-foreground text-sm font-light mt-1">Configure Sabyan Result System branding, result parameters, and credentials.</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Configuration settings */}
-        <Card>
-          <CardHeader>
-            <CardTitle>System Configuration</CardTitle>
-            <CardDescription>Tailor report card headers and assessment precision.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSaveConfig} className="space-y-4">
-              {error && (
-                <div className="flex items-center gap-2 rounded-lg bg-destructive/15 p-3 text-xs text-destructive font-medium border border-destructive/20">
-                  <AlertCircle className="h-4 w-4 shrink-0" />
-                  <span>{error}</span>
-                </div>
-              )}
-              {success && (
-                <div className="flex items-center gap-2 rounded-lg bg-emerald-500/15 p-3 text-xs text-emerald-600 font-medium border border-emerald-500/20">
-                  <CheckCircle2 className="h-4 w-4 shrink-0" />
-                  <span>{success}</span>
-                </div>
-              )}
-
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium">School Name (Header Branding)</label>
-                <Input
-                  value={schoolName}
-                  onChange={e => setSchoolName(e.target.value)}
-                  placeholder="Sabyan School"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium">Numerical Scoring Precision</label>
-                <Select
-                  value={precision}
-                  onChange={e => setPrecision(e.target.value)}
-                  options={[
-                    { value: '0', label: 'Nearest Integer (e.g. 85)' },
-                    { value: '1', label: '1 Decimal Place (e.g. 85.2)' },
-                    { value: '2', label: '2 Decimal Places (e.g. 85.23)' }
-                  ]}
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium">Student Ranking / Positions</label>
-                <Select
-                  value={rankingEnabled}
-                  onChange={e => setRankingEnabled(e.target.value)}
-                  options={[
-                    { value: 'false', label: 'Disabled (Do not print rankings)' },
-                    { value: 'true', label: 'Enabled (Include position in reports)' }
-                  ]}
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium">Annual Calculation Policy</label>
-                <Select
-                  value={annualPolicy}
-                  onChange={e => setAnnualPolicy(e.target.value)}
-                  options={[
-                    { value: '50/50', label: 'Equal Weight: 50% S1 + 50% S2' },
-                    { value: 'none', label: 'No Annual Calculations (independent semesters only)' }
-                  ]}
-                />
-              </div>
-
-              <Button type="submit" className="w-full mt-2">
-                Save Configuration
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
-
+      <div className="max-w-md mx-auto">
         {/* Change Password */}
         <Card>
           <CardHeader>
