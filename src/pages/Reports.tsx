@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { dbSelect } from '../services/db';
-import { jsPDF } from 'jspdf';
-import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import { Button } from '../components/ui/button';
 import { Select } from '../components/ui/select';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../components/ui/card';
-import { AlertCircle, CheckCircle2, FileText, Download } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Download } from 'lucide-react';
 
 interface Grade {
   id: number;
@@ -20,29 +18,12 @@ interface Section {
   name: string;
 }
 
-
-
-interface Student {
-  id: string;
-  name: string;
-}
-
-interface SubjectScore {
-  subject_name: string;
-  score: number;
-  max_mark: number;
-  weight: number;
-  status: string;
-}
-
 export const Reports: React.FC = () => {
   const { activeYearId, activeSemesterId, settings } = useApp();
   const [grades, setGrades] = useState<Grade[]>([]);
   const [selectedGradeId, setSelectedGradeId] = useState('');
   const [sections, setSections] = useState<Section[]>([]);
   const [selectedSectionId, setSelectedSectionId] = useState('');
-  const [students, setStudents] = useState<Student[]>([]);
-  const [selectedStudentId, setSelectedStudentId] = useState('');
 
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -80,29 +61,6 @@ export const Reports: React.FC = () => {
     }
   }, [selectedGradeId]);
 
-  // Load students based on section
-  useEffect(() => {
-    if (!selectedSectionId) {
-      setStudents([]);
-      setSelectedStudentId('');
-      return;
-    }
-    try {
-      const rows = dbSelect<Student>(
-        'SELECT id, name FROM students WHERE section_id = ? AND status = "ACTIVE" ORDER BY name ASC',
-        [Number(selectedSectionId)]
-      );
-      setStudents(rows);
-      if (rows.length > 0) {
-        setSelectedStudentId(rows[0].id);
-      } else {
-        setSelectedStudentId('');
-      }
-    } catch (err) {
-      setError('Failed to load students.');
-    }
-  }, [selectedSectionId]);
-
   // helper: fetch academic year name
   const getYearName = () => {
     if (!activeYearId) return '';
@@ -115,141 +73,6 @@ export const Reports: React.FC = () => {
     if (!activeSemesterId) return '';
     const nameRow = dbSelect<{ name: string }>('SELECT name FROM semesters WHERE id = ?', [activeSemesterId]);
     return nameRow.length > 0 ? nameRow[0].name : '';
-  };
-
-  // 1. PDF Report: Individual Student Report card
-  const handleExportStudentPDF = async () => {
-    setError('');
-    setSuccess('');
-    if (!activeSemesterId || !selectedStudentId) {
-      setError('Select an active year/semester and a student.');
-      return;
-    }
-
-    setGenerating(true);
-    try {
-      const studentName = students.find(s => s.id === selectedStudentId)?.name || '';
-      const gradeName = grades.find(g => g.id === Number(selectedGradeId))?.name || '';
-      const sectionName = sections.find(s => s.id === Number(selectedSectionId))?.name || '';
-      const yearName = getYearName();
-      const semName = getSemesterName();
-
-      // Fetch student results
-      const scores = dbSelect<SubjectScore>(`
-        SELECT sub.name as subject_name, m.score as score
-        FROM marks m
-        JOIN subjects sub ON m.subject_id = sub.id
-        WHERE m.student_id = ? AND m.semester_id = ?
-        ORDER BY sub.name ASC
-      `, [selectedStudentId, activeSemesterId]);
-
-      if (scores.length === 0) {
-        setError('No scores entered for this student in the current semester.');
-        setGenerating(false);
-        return;
-      }
-
-      // Calculate Total & Average
-      const totalScore = scores.reduce((sum, s) => sum + s.score, 0);
-      const averageScore = totalScore / scores.length;
-
-      // Ranking Policy: Rank students based on numerical average for this section
-      let rankString = 'N/A';
-      if (settings.ranking_enabled) {
-        const classAverages = dbSelect<{ student_id: string; avg: number }>(`
-          SELECT student_id, AVG(score) as avg
-          FROM marks
-          WHERE semester_id = ? AND student_id IN (
-            SELECT id FROM students WHERE section_id = ?
-          )
-          GROUP BY student_id
-          ORDER BY avg DESC
-        `, [activeSemesterId, Number(selectedSectionId)]);
-
-        const myRank = classAverages.findIndex(c => c.student_id === selectedStudentId) + 1;
-        if (myRank > 0) {
-          rankString = `${myRank} / ${classAverages.length}`;
-        }
-      }
-
-      // Create PDF
-      const doc = new jsPDF();
-      
-      // Header
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(22);
-      doc.setTextColor(41, 128, 185);
-      doc.text(settings.school_name, 105, 20, { align: "center" });
-
-      doc.setFontSize(14);
-      doc.setTextColor(100);
-      doc.text(`Official Academic Report Card`, 105, 30, { align: "center" });
-      doc.text(`${yearName} — ${semName}`, 105, 38, { align: "center" });
-
-      // Student Info Box
-      doc.setDrawColor(200);
-      doc.setFillColor(248, 249, 250);
-      doc.rect(15, 48, 180, 32, "FD");
-
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(10);
-      doc.setTextColor(50);
-      doc.text(`Student Name:  ${studentName}`, 20, 56);
-      doc.text(`Student ID:      ${selectedStudentId}`, 20, 64);
-      doc.text(`Grade Level:     ${gradeName}`, 20, 72);
-
-      doc.text(`Class Section:  ${sectionName}`, 120, 56);
-      doc.text(`Ranking:          ${rankString}`, 120, 64);
-
-      // Report Table
-      const tableBody = scores.map(s => [s.subject_name, s.score.toFixed(settings.precision)]);
-
-      autoTable(doc, {
-        startY: 88,
-        head: [['Subject Name', 'Score (100%)']],
-        body: tableBody,
-        theme: 'striped',
-        headStyles: { fillColor: [41, 128, 185], halign: 'left' },
-        columnStyles: {
-          0: { cellWidth: 120, halign: 'left' },
-          1: { cellWidth: 60, halign: 'right' }
-        }
-      });
-
-      // Totals
-      const finalY = (doc as any).lastAutoTable.finalY + 10;
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(11);
-      doc.text(`Total Score:     ${totalScore.toFixed(settings.precision)}`, 140, finalY);
-      doc.text(`Average Score:   ${averageScore.toFixed(settings.precision)}`, 140, finalY + 8);
-
-      // Signature Area
-      (doc as any).setLineDash([2, 2], 0);
-      doc.line(20, finalY + 45, 80, finalY + 45);
-      doc.line(130, finalY + 45, 190, finalY + 45);
-      
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(10);
-      doc.text("Homeroom Teacher Signature", 22, finalY + 50);
-      doc.text("Director Signature", 148, finalY + 50);
-
-      // Convert to buffer & save
-      const pdfBuffer = doc.output('arraybuffer');
-      const cleanName = studentName.replace(/\s+/g, '_');
-      const savedPath = await window.electron.saveFileDialog({
-        defaultName: `Report_${cleanName}_${semName.replace(/\s+/g, '_')}.pdf`,
-        filters: [{ name: 'PDF Documents', extensions: ['pdf'] }],
-        arrayBuffer: pdfBuffer
-      });
-
-      if (savedPath) {
-        setSuccess(`PDF Report Card saved successfully at: ${savedPath}`);
-      }
-    } catch (err: any) {
-      setError(err.message || 'Failed to export PDF.');
-    } finally {
-      setGenerating(false);
-    }
   };
 
   // 2. Excel Export: Class Report Sheet
@@ -361,7 +184,7 @@ export const Reports: React.FC = () => {
     <div className="space-y-6 max-w-6xl mx-auto animate-in fade-in-50">
       <div>
         <h1 className="text-2xl font-bold tracking-tight text-foreground">Reports & Export</h1>
-        <p className="text-muted-foreground text-sm font-light mt-1">Export local database marks to professional print-ready PDFs or spreadsheet XLSX files.</p>
+        <p className="text-muted-foreground text-sm font-light mt-1">Export local database marks to professional spreadsheet XLSX files.</p>
       </div>
 
       {error && (
@@ -378,54 +201,8 @@ export const Reports: React.FC = () => {
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Left Card: Individual Student Report */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <FileText className="h-5 w-5 text-primary" />
-              <CardTitle>Individual Student PDF Report</CardTitle>
-            </div>
-            <CardDescription>Generate a printable semester report card for a single student.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium">Grade Level</label>
-              <Select
-                value={selectedGradeId}
-                onChange={e => setSelectedGradeId(e.target.value)}
-                options={grades.map(g => ({ value: g.id, label: g.name }))}
-              />
-            </div>
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium">Class Section</label>
-              <Select
-                value={selectedSectionId}
-                onChange={e => setSelectedSectionId(e.target.value)}
-                placeholder={sections.length === 0 ? "No Sections Configured" : "Select Section"}
-                options={sections.map(s => ({ value: s.id, label: s.name }))}
-              />
-            </div>
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium">Select Student</label>
-              <Select
-                value={selectedStudentId}
-                onChange={e => setSelectedStudentId(e.target.value)}
-                placeholder={students.length === 0 ? "No Students Configured" : "Select Student"}
-                options={students.map(st => ({ value: st.id, label: st.name }))}
-              />
-            </div>
-            <Button
-              onClick={handleExportStudentPDF}
-              disabled={generating || !selectedStudentId}
-              className="w-full gap-2 mt-2"
-            >
-              <FileText className="h-4 w-4" /> {generating ? 'Generating PDF...' : 'Export Student Report PDF'}
-            </Button>
-          </CardContent>
-        </Card>
-
-        {/* Right Card: Class spreadsheet export */}
+      <div className="max-w-md mx-auto">
+        {/* Class spreadsheet export */}
         <Card>
           <CardHeader>
             <div className="flex items-center gap-2">
