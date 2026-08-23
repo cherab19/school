@@ -60,8 +60,8 @@ export const AcademicYears: React.FC = () => {
     setError('');
     setSuccess('');
 
-    if (!/^\d{4}\/\d{4}$/.test(newYearName)) {
-      setError('Academic Year must follow YYYY/YYYY format (e.g. 2027/2028)');
+    if (!/^\d{4}\s*E\.C\.?$/i.test(newYearName)) {
+      setError('Academic Year must follow YYYY E.C. format (e.g. 2019 E.C.)');
       return;
     }
 
@@ -263,9 +263,9 @@ export const AcademicYears: React.FC = () => {
                   <Input
                     value={newYearName}
                     onChange={(e) => setNewYearName(e.target.value)}
-                    placeholder="e.g. 2027/2028"
+                    placeholder="e.g. 2019 E.C."
                   />
-                  <p className="text-[11px] text-muted-foreground">Must be YYYY/YYYY format.</p>
+                  <p className="text-[11px] text-muted-foreground">Must be YYYY E.C. format.</p>
                 </div>
                 <Button type="submit" className="w-full">
                   Create Academic Year
