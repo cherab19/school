@@ -82,7 +82,6 @@ export const SettingsPage: React.FC = () => {
     <div className="space-y-6 max-w-4xl mx-auto animate-in fade-in-50">
       <div>
         <h1 className="text-2xl font-bold tracking-tight text-foreground">Settings</h1>
-        <p className="text-muted-foreground text-sm font-light mt-1">Configure Sabyan Result System branding, result parameters, and credentials.</p>
       </div>
 
       <div className="max-w-md mx-auto">
