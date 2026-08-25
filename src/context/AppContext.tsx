@@ -49,7 +49,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [currentUser, setCurrentUser] = useState<string | null>(null);
   
   const [settings, setSettings] = useState<AppSettings>({
-    school_name: 'Sabiyan No.1 Primary and Secondary School',
+    school_name: 'Sabiyan No.1 Primary and Middle School',
     precision: 1,
     ranking_enabled: false,
     annual_policy: '50/50'
