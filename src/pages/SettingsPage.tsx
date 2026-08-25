@@ -86,15 +86,17 @@ export const SettingsPage: React.FC = () => {
 
       <div className="max-w-md mx-auto">
         {/* Change Password */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <ShieldCheck className="h-5 w-5 text-primary" />
-              <CardTitle>Change Admin Password</CardTitle>
+        <Card className="border border-primary/10 shadow-lg bg-card/60 backdrop-blur-md">
+          <CardHeader className="bg-primary/5 border-b border-primary/10 pb-4">
+            <div className="flex items-center gap-2.5">
+              <ShieldCheck className="h-5 w-5 text-primary animate-pulse" />
+              <CardTitle className="text-foreground font-bold">Change Admin Password</CardTitle>
             </div>
-            <CardDescription>Secure administrative access to Sabyan Result System.</CardDescription>
+            <CardDescription className="text-muted-foreground text-xs font-light mt-1">
+              Secure administrative credentials for Sabiyan No.1 Primary and Secondary School.
+            </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-6">
             <form onSubmit={handleChangePassword} className="space-y-4">
               {passwordError && (
                 <div className="flex items-center gap-2 rounded-lg bg-destructive/15 p-3 text-xs text-destructive font-medium border border-destructive/20">
@@ -110,36 +112,39 @@ export const SettingsPage: React.FC = () => {
               )}
 
               <div className="space-y-1.5">
-                <label className="text-sm font-medium">Current Password</label>
+                <label className="text-sm font-medium text-foreground">Current Password</label>
                 <Input
                   type="password"
                   value={oldPassword}
                   onChange={e => setOldPassword(e.target.value)}
                   placeholder="••••••••"
+                  className="bg-background/50 border-border hover:border-primary/20 focus:border-primary transition-all"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-sm font-medium">New Password</label>
+                <label className="text-sm font-medium text-foreground">New Password</label>
                 <Input
                   type="password"
                   value={newPassword}
                   onChange={e => setNewPassword(e.target.value)}
                   placeholder="••••••••"
+                  className="bg-background/50 border-border hover:border-primary/20 focus:border-primary transition-all"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-sm font-medium">Confirm New Password</label>
+                <label className="text-sm font-medium text-foreground">Confirm New Password</label>
                 <Input
                   type="password"
                   value={confirmPassword}
                   onChange={e => setConfirmPassword(e.target.value)}
                   placeholder="••••••••"
+                  className="bg-background/50 border-border hover:border-primary/20 focus:border-primary transition-all"
                 />
               </div>
 
-              <Button type="submit" variant="secondary" className="w-full mt-2" disabled={loading}>
+              <Button type="submit" variant="primary" className="w-full mt-2 gap-2 h-10 shadow-sm hover:shadow transition-all cursor-pointer" disabled={loading}>
                 {loading ? 'Updating Password...' : 'Change Password'}
               </Button>
             </form>
