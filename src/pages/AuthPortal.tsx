@@ -30,7 +30,7 @@ export const AuthPortal: React.FC = () => {
 
   // Setup Wizard States
   const [setupStep, setSetupStep] = useState(1);
-  const [setupSchoolName, setSetupSchoolName] = useState('Sabiyan No.1 Primary and Secondary School');
+  const [setupSchoolName, setSetupSchoolName] = useState('Sabiyan No.1 Primary and Middle School');
   const [setupAcademicYear, setSetupAcademicYear] = useState('2019 E.C.');
   const [setupPassword, setSetupPassword] = useState('');
   const [setupConfirmPassword, setSetupConfirmPassword] = useState('');
@@ -229,7 +229,7 @@ export const AuthPortal: React.FC = () => {
 
         // 2. Set settings
         await updateSettings({
-          school_name: 'Sabiyan No.1 Primary and Secondary School',
+          school_name: 'Sabiyan No.1 Primary and Middle School',
           precision: 1,
           ranking_enabled: true,
           annual_policy: '50/50'
@@ -270,7 +270,7 @@ export const AuthPortal: React.FC = () => {
             <div className="h-10 w-10 overflow-hidden rounded-full border border-white/20 bg-white p-0.5 shadow-sm">
               <img src="logo.png" className="h-full w-full object-contain" alt="Logo" />
             </div>
-            <span className="font-extrabold text-[11px] tracking-wide uppercase text-white/90">Sabiyan No.1 Primary and Secondary School</span>
+            <span className="font-extrabold text-[11px] tracking-wide uppercase text-white/90">Sabiyan No.1 Primary and Middle School</span>
           </div>
 
           <div className="space-y-4 my-auto">
