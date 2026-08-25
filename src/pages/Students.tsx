@@ -105,8 +105,14 @@ export const Students: React.FC = () => {
     setStudentId('');
     setFullName('');
     setGender('Male');
-    setSelectedGrade(grades.length > 0 ? String(grades[0].id) : '');
-    setSelectedSection('');
+    
+    const defaultGradeId = grades.length > 0 ? String(grades[0].id) : '';
+    setSelectedGrade(defaultGradeId);
+
+    // Explicitly pre-fill section matching default grade level
+    const matchedSections = allSections.filter(s => s.grade_id === Number(defaultGradeId));
+    setSelectedSection(matchedSections.length > 0 ? String(matchedSections[0].id) : '');
+
     setStatus('ACTIVE');
     setError('');
     setIsDialogOpen(true);
