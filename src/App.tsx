@@ -221,9 +221,6 @@ const AppContent: React.FC = () => {
           </div>
           
           <div className="flex items-center gap-4">
-            <div className="text-xs text-right text-muted-foreground">
-              <p className="font-semibold text-foreground">Sabiyan No.1 Primary and Secondary School</p>
-            </div>
             <button
               onClick={logout}
               className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-muted-foreground hover:text-destructive hover:bg-destructive/10 border border-border hover:border-destructive/20 rounded-lg transition-all cursor-pointer"
