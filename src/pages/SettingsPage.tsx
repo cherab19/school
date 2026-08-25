@@ -93,7 +93,7 @@ export const SettingsPage: React.FC = () => {
               <CardTitle className="text-foreground font-bold">Change Admin Password</CardTitle>
             </div>
             <CardDescription className="text-muted-foreground text-xs font-light mt-1">
-              Secure administrative credentials for Sabiyan No.1 Primary and Secondary School.
+              Secure administrative credentials for Sabiyan No.1 Primary and Middle School.
             </CardDescription>
           </CardHeader>
           <CardContent className="pt-6">
