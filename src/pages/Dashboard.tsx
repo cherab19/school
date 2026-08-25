@@ -72,7 +72,6 @@ export const Dashboard: React.FC = () => {
       <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-6 rounded-2xl border border-primary/10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight text-foreground">Welcome to {settings.school_name}</h1>
-          <p className="text-muted-foreground text-sm font-light mt-1">Sabyan School Academic Result Management Node</p>
         </div>
         <div className="flex items-center gap-3 bg-card px-4 py-2.5 rounded-xl border border-border shadow-sm">
           <div className="text-xs">
