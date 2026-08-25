@@ -31,7 +31,7 @@ export const AuthPortal: React.FC = () => {
   // Setup Wizard States
   const [setupStep, setSetupStep] = useState(1);
   const [setupSchoolName, setSetupSchoolName] = useState('Sabiyan No.1 Primary and Secondary School');
-  const [setupAcademicYear, setSetupAcademicYear] = useState('2018 E.C.');
+  const [setupAcademicYear, setSetupAcademicYear] = useState('2019 E.C.');
   const [setupPassword, setSetupPassword] = useState('');
   const [setupConfirmPassword, setSetupConfirmPassword] = useState('');
   const [setupRecoveryAnswer, setSetupRecoveryAnswer] = useState('');
@@ -509,11 +509,11 @@ export const AuthPortal: React.FC = () => {
                 {setupStep === 1 && (
                   <div className="space-y-4 animate-in slide-in-from-right-5">
                     <div className="space-y-1.5">
-                      <label className="text-sm font-medium">Initial Academic Year</label>
+                      <label className="text-sm font-medium">Academic Year</label>
                       <Input 
                         value={setupAcademicYear}
                         onChange={e => setSetupAcademicYear(e.target.value)}
-                        placeholder="2018 E.C."
+                        placeholder="2019 E.C."
                       />
                       <p className="text-[10px] text-muted-foreground mt-0.5 leading-relaxed">
                         Creates the active Academic Cycle. Semesters 1 and 2 will be initialized.
